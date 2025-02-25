@@ -86,3 +86,8 @@ object CsvParser:
           .atOffset(ZoneOffset.UTC)
           .toLocalDateTime
       else LocalDateTime.parse(valueTrimmed, DateTimeFormatter.ISO_DATE_TIME)
+
+  given optionCsvParser[T](using parser: CsvParser[T]): CsvParser[Option[T]] with
+    def parse(value: String): Option[T] =
+      val trimmed = value.trim
+      if trimmed.isEmpty then None else Some(parser.parse(trimmed))    
