@@ -1,0 +1,8 @@
+starDate,logType,crewId,crewName,log,starfleetDateTime,earthDate
+41153.7,CaptainsLog,1,Jean-Luc Picard,"The Enterprise's has entered a new star system, and ...",2364-01-03T10:00:00,2364-01-03
+41254.2,FirstOfficerLog,2,William Riker," We are investigating a distress signal...",2364-02-15T14:30:00,2364-02-15
+41456.8,ChiefMedicalOfficerLog,3,Beverly Crusher,"Several crew members are experiencing...",2364-04-20T08:15:00,2364-04-20
+41765.3,PersonalLog,4,Data,"I am attempting to understand...",2364-07-10T18:00:00,2364-07-10
+1312.4,CaptainsLog,5,Christopher Pike,"Sensors have detected unusual energy readings",2254-05-12T09:00:00,2254-05-12
+1533.6,FirstOfficerLog,6,Spock,"We are approaching the planet Talos IV...",2254-09-15T11:30:00,2254-09-15
+2230.6,CaptainsLog,7,James T. Kirk,"The Enterprise is on a five-year mission...",2265-01-08T10:00:00,2265-01-08
