@@ -1,38 +1,105 @@
-# generic-csv-parser
-A generic parser to read from CSV to a case class in Scala 3
+# Generic CSV Parser in Scala 3
 
-Given a path to the CSV file and a required case class T, this converts it into List[T].
+## Overview
+This project provides a **generic CSV parser** in Scala 3 that can read CSV files and map them to case classes using **type-safe generic programming**. It supports various built-in types and allows custom parsing logic for user-defined types.
 
-This uses the [scala-csv](https://github.com/tototoshi/scala-csv) under the hood to read csv as Seq[Seq[_]] and uses Scala 3 Mirror to convert into case class
+## Features
+- **Generic Parsing**: Uses Scala 3's **Mirror API** and **inline metaprogramming** to derive parsers automatically.
+- **Built-in Type Support**:
+  - `String`, `Int`, `Long`, `Double`
+  - `LocalDate`, `LocalDateTime` (formatted as ISO date/time)
+  - `Option[T]` (handles empty values as `None`)
+- **Custom Parsing**: Easily extendable for custom types (e.g., enums).
+- **Error Handling**: Reports errors with row numbers for easier debugging.
 
-**Note: This is still work in progress!**
+## Run
+You can run this sample project using the scala-cli:
 
-# How to run the sample?
-
-Running is very simple, just use the command:
 ```
 scala-cli .
 ```
 
-# Usage
+## Usage
 
-You can create the required case class that are required for mapping the csv. Only the basic types such as String, Int, Long, Double, LocalDate and LocalDateTime are now supported out of the box. For other types, it is possible to provide a parser as given instance and it uses it.
+### 1. Define Your Case Class
+Create a case class that matches the structure of your CSV file.
 
-Here is an example:
+```scala
+import java.time.LocalDate
+import java.time.LocalDateTime
 
-```
 enum LogType:
-    case CaptainsLog, FirstOfficerLog, ChiefMedicalOfficerLog, PersonalLog
+  case CaptainsLog, FirstOfficerLog, ChiefMedicalOfficerLog, PersonalLog
 
-case class StarLogs(starDate: Double, logType: LogType, crewId: Int, crewName: String, log: String, starfleetDateTime: LocalDateTime, earthDate: LocalDate)
-
-object StarLogs {
-    given CsvParser[LogType] with
-        def parse(value: String): LogType = LogType.valueOf(value)
-}
-
-val parser = GenericCsvParser[StarLogs]
-val csvData: Either[String, List[StarLogs]] = parser.read(new File("starlog.csv"))  
+case class StarLogs(
+    starDate: Double,
+    logType: LogType,
+    crewId: Int,
+    crewName: String,
+    log: String,
+    starfleetDateTime: LocalDateTime,
+    earthDate: LocalDate
+)
 ```
 
-In this case, we provided a custom given instance to map the enum LogType.
+### 2. Define Custom Parsing (if needed)
+If your case class contains custom types (like enums), define a `CsvParser` for them:
+
+```scala
+object StarLogs {
+  given CsvParser[LogType] with
+    def parse(value: String): LogType = LogType.valueOf(value)
+}
+```
+
+### 3. Parse a CSV File
+Create an instance of `GenericCsvParser` and read a CSV file:
+
+```scala
+import java.io.File
+import StarLogs.given
+
+@main
+def main = {
+  val parser = GenericCsvParser[StarLogs]
+  val csvData = parser.read(new File("starlog.csv"))
+
+  csvData match {
+    case Right(logs) =>
+      println(s"Successfully read ${logs.size} logs:")
+      logs.foreach(println)
+    case Left(error) => println("Error: " + error)
+  }
+}
+```
+
+### 4. Handling Optional Fields
+The parser supports `Option[T]`, treating empty fields as `None`:
+
+```scala
+case class CrewMember(
+    id: Int,
+    name: String,
+    rank: Option[String] // Can be None if missing in CSV
+)
+```
+
+## How It Works
+- **Generic Parsing:** Uses `Mirror.ProductOf[T]` to extract field types at compile-time.
+- **Tuple Conversion:** Converts CSV rows into tuples and then into case class instances.
+- **Summoning Parsers:** Automatically finds the appropriate `CsvParser` for each field.
+- **scala-csv under the hood:** Uses [scala-csv](https://github.com/tototoshi/scala-csv) library to read the file to List[List[_]] before building the case class
+
+## Extending the Parser
+To support a **new type**, define a `CsvParser` instance:
+
+```scala
+given CsvParser[Boolean] with
+  def parse(value: String): Boolean = value.trim.toBoolean
+```
+
+Then, you can use `Boolean` fields in your case classes.
+
+## Error Handling
+If a CSV row has a parsing error, it will return `Left("Row X: error message")`, helping you debug issues easily.
+
