@@ -1,5 +1,7 @@
 # Generic CSV Parser in Scala 3
 
+Blog Link: https://yadukrishnan.live/a-generic-approach-to-parsing-csv-into-case-classes-in-scala-3
+
 ## Overview
 This project provides a **generic CSV parser** in Scala 3 that can read CSV files and map them to case classes using **type-safe generic programming**. It supports various built-in types and allows custom parsing logic for user-defined types.
 
